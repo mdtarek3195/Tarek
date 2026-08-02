@@ -228,70 +228,52 @@ transactions.forEach(t => {
 
 });
 
-transfers.forEach(t => {
 
-    if (
-        account === "ALL"
-    ) {
+	transfers.forEach(t => {
+
+    if (account === "ALL") {
 
         ledgerEntries.push({
 
-            entryType:
-                "transfer",
+            entryType: "transfer",
 
-            date:
-                t.date,
+            date: t.date,
 
-            amount:
-                t.amount,
+            amount: t.amount,
 
-            note:
-                `Transfer ${t.fromAccount} → ${t.toAccount}`
+            note: `Transfer ${t.fromAccount} → ${t.toAccount}`
 
         });
 
-    }
-    else {
+    } else {
 
-        if (
-            t.fromAccount === account
-        ) {
+        if (t.fromAccount === account) {
 
             ledgerEntries.push({
 
-                entryType:
-                    "transfer-out",
+                entryType: "transfer-out",
 
-                date:
-                    t.date,
+                date: t.date,
 
-                amount:
-                    t.amount,
+                amount: t.amount,
 
-                note:
-                    `Transfer To ${t.toAccount}`
+                note: `Transfer To ${t.toAccount}`
 
             });
 
         }
 
-        if (
-            t.toAccount === account
-        ) {
+        if (t.toAccount === account) {
 
             ledgerEntries.push({
 
-                entryType:
-                    "transfer-in",
+                entryType: "transfer-in",
 
-                date:
-                    t.date,
+                date: t.date,
 
-                amount:
-                    t.amount,
+                amount: t.amount,
 
-                note:
-                    `Transfer From ${t.fromAccount}`
+                note: `Transfer From ${t.fromAccount}`
 
             });
 
@@ -299,7 +281,10 @@ transfers.forEach(t => {
 
     }
 
-});
+}
+		
+		
+		);
 
 
 

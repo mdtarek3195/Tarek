@@ -41,11 +41,13 @@ const Statement = (() => {
 
         dropdown.innerHTML = `
 
-            <option value="">
-                Select Account
-            </option>
+    <option value="ALL">
 
-        `;
+        All Accounts
+
+    </option>
+
+`;
 
         accounts.forEach(account => {
 
@@ -124,17 +126,26 @@ const Statement = (() => {
             return;
         }
 
-		const transactions =
-			Storage.getTransactions()
-			.filter(t =>
+		if (
 
-				t.account === account &&
+    selectedAccount !==
+    "ALL"
 
-				t.date >= fromDate &&
+) {
 
-				t.date <= toDate
+    transactions =
 
-			);
+        transactions.filter(
+
+            t =>
+
+            t.account ===
+
+            selectedAccount
+
+        );
+
+		}
 
 		const transfers =
 			Storage.getTransfers()

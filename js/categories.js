@@ -28,7 +28,6 @@ const Categories = (() => {
     // DEFAULT CATEGORIES
     // =========================
 
-    function initializeDefaultCategories() {
 function initializeDefaultCategories() {
 
     const existing =

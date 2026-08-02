@@ -229,21 +229,7 @@ const transfers =
 				});
 				
 		
-                    t.date,
-
-                amount:
-                    t.amount,
-
-                note:
-                    `Transfer From ${t.fromAccount}`
-
-            });
-
-        }
-
-    }
-
-});
+            
 
 		transfers.forEach(t => {
 

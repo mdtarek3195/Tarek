@@ -200,38 +200,35 @@ const transfers =
 		
 		
 				
-			const ledgerEntries = [];
-			
-			transactions.forEach(t => {
+	const ledgerEntries = [];
 
-			ledgerEntries.push({
+transactions.forEach(t => {
 
-				entryType:
-					"transaction",
+    ledgerEntries.push({
 
-				date:
-					t.date,
+        entryType:
+            "transaction",
 
-				type:
-					t.type,
+        date:
+            t.date,
 
-				category:
-					t.category,
+        type:
+            t.type,
 
-				amount:
-					t.amount,
+        category:
+            t.category,
 
-				note:
-					t.note || ""
+        amount:
+            t.amount,
 
-					});
+        note:
+            t.note || ""
 
-				});
-				
-		
-            
+    });
 
-		transfers.forEach(t => {
+});
+
+transfers.forEach(t => {
 
     if (
         account === "ALL"

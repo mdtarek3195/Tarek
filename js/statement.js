@@ -100,225 +100,225 @@ const Statement = (() => {
     // GENERATE STATEMENT
     // =========================
 
-    function generateStatement() {
+    
+function generateStatement() {
 
-		let transactions =
-    Storage.getTransactions();
+    let transactions = Storage.getTransactions();
 
-        const account =
-            document.getElementById(
-                "statementAccount"
-            ).value;
+    const account =
+        document.getElementById(
+            "statementAccount"
+        ).value;
 
-        const fromDate =
-            document.getElementById(
-                "statementFromDate"
-            ).value;
+    const fromDate =
+        document.getElementById(
+            "statementFromDate"
+        ).value;
 
-        const toDate =
-            document.getElementById(
-                "statementToDate"
-            ).value;
+    const toDate =
+        document.getElementById(
+            "statementToDate"
+        ).value;
 
-        if (!account) {
+    if (!account) {
 
-            alert(
-                "Please select account."
-            );
-
-            return;
-        }
-
-		
-
-if (
-    account !== "ALL"
-) {
-
-    transactions =
-
-        transactions.filter(
-
-            t =>
-
-                t.account === account
-
+        alert(
+            "Please select account."
         );
 
-}
+        return;
+    }
 
-		transactions =
+    // Account Filter
 
-    transactions.filter(
+    if (
+        account !== "ALL"
+    ) {
 
-        t =>
+        transactions =
+            transactions.filter(
+                t =>
+                    t.account === account
+            );
+    }
+
+    // Date Filter
+
+    transactions =
+        transactions.filter(
+            t =>
+                (!fromDate ||
+                    t.date >= fromDate)
+                &&
+                (!toDate ||
+                    t.date <= toDate)
+        );
+
+    // Transfers
+
+    const transfers =
+        Storage.getTransfers()
+        .filter(t =>
+
+            (
+                account === "ALL"
+                ||
+                t.fromAccount === account
+                ||
+                t.toAccount === account
+            )
+
+            &&
 
             (!fromDate ||
-
                 t.date >= fromDate)
 
             &&
 
             (!toDate ||
-
                 t.date <= toDate)
 
-    );
+        );
 
-const transfers =
-    Storage.getTransfers()
-    .filter(t =>
+    // Ledger Entries
 
-        (
+    const ledgerEntries = [];
 
-            account === "ALL"
-
-            ||
-
-            t.fromAccount === account
-
-            ||
-
-            t.toAccount === account
-
-        )
-
-        &&
-
-        (!fromDate ||
-
-            t.date >= fromDate)
-
-        &&
-
-        (!toDate ||
-
-            t.date <= toDate)
-
-    );
-
-		
-		
-				
-	const ledgerEntries = [];
-
-transactions.forEach(t => {
-
-    ledgerEntries.push({
-
-        entryType:
-            "transaction",
-
-        date:
-            t.date,
-
-        type:
-            t.type,
-
-        category:
-            t.category,
-
-        amount:
-            t.amount,
-
-        note:
-            t.note || ""
-
-    });
-
-});
-
-
-transfers.forEach(t => {
-
-    if (account === "ALL") {
+    transactions.forEach(t => {
 
         ledgerEntries.push({
 
-            entryType: "transfer",
+            entryType:
+                "transaction",
 
-            date: t.date,
+            date:
+                t.date,
 
-            amount: t.amount,
+            type:
+                t.type,
 
-            note: `Transfer ${t.fromAccount} → ${t.toAccount}`
+            category:
+                t.category,
+
+            amount:
+                Number(t.amount),
+
+            note:
+                t.note || ""
 
         });
 
-    } else {
+    });
 
-        if (t.fromAccount === account) {
+    transfers.forEach(t => {
+
+        if (
+            account === "ALL"
+        ) {
 
             ledgerEntries.push({
 
-                entryType: "transfer-out",
+                entryType:
+                    "transfer",
 
-                date: t.date,
+                date:
+                    t.date,
 
-                amount: t.amount,
+                amount:
+                    Number(t.amount),
 
-                note: `Transfer To ${t.toAccount}`
+                note:
+                    `Transfer ${t.fromAccount} → ${t.toAccount}`
 
             });
 
         }
+        else {
 
-        if (t.toAccount === account) {
+            if (
+                t.fromAccount === account
+            ) {
 
-            ledgerEntries.push({
+                ledgerEntries.push({
 
-                entryType: "transfer-in",
+                    entryType:
+                        "transfer-out",
 
-                date: t.date,
+                    date:
+                        t.date,
 
-                amount: t.amount,
+                    amount:
+                        Number(t.amount),
 
-                note: `Transfer From ${t.fromAccount}`
+                    note:
+                        `Transfer To ${t.toAccount}`
 
-            });
+                });
+
+            }
+
+            if (
+                t.toAccount === account
+            ) {
+
+                ledgerEntries.push({
+
+                    entryType:
+                        "transfer-in",
+
+                    date:
+                        t.date,
+
+                    amount:
+                        Number(t.amount),
+
+                    note:
+                        `Transfer From ${t.fromAccount}`
+
+                });
+
+            }
 
         }
 
-    }
+    });
 
-});
+    // Sort
 
+    ledgerEntries.sort(
 
+        (a, b) =>
 
+            new Date(a.date) -
+            new Date(b.date)
 
+    );
 
+    const openingBalance =
+        calculateOpeningBalance(
+            account,
+            fromDate
+        );
+
+    statementData =
+        ledgerEntries;
+
+    renderStatement(
+        ledgerEntries,
+        openingBalance
+    );
+
+    updateSummary(
+        transactions,
+        openingBalance
+    );
+
+}
 
 
 				
 
-			ledgerEntries.sort(
-
-			(a, b) =>
-
-			new Date(a.date) -
-
-			new Date(b.date)
-
-			);
-
-		const openingBalance =
-			calculateOpeningBalance(
-				account,
-				fromDate
-			);
-
-			statementData = ledgerEntries;
-
-			renderStatement(
-				ledgerEntries,
-				openingBalance
-			);
-
-		updateSummary(
-			transactions,
-			openingBalance
-		);
-    }
+			
 
     // =========================
     // RENDER TABLE

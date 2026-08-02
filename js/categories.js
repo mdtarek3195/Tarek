@@ -29,32 +29,17 @@ const Categories = (() => {
     // =========================
 
     function initializeDefaultCategories() {
+function initializeDefaultCategories() {
 
-		const existing = Storage.getCategories();
+    const existing =
+        Storage.getCategories();
 
-		if (
-			existing.length > 0 &&
-			typeof existing[0] === "string"
-		) {
-
-			const converted =
-				existing.map(name => ({
-
-					id: Date.now() + Math.random(),
-
-					name,
-
-					type: "expense"
-
-				}));
-
-			localStorage.setItem(
-				"em_categories",
-				JSON.stringify(converted)
-			);
-
-			return;
-		}
+    if (
+        existing &&
+        existing.length > 0
+    ) {
+        return;
+    }
         const defaults = [
 
             {

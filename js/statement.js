@@ -385,235 +385,202 @@ function calculateOpeningBalance(
 }
 
 	
-
-	function renderStatement(
-			transactions,
-			openingBalance
-		) {
-
-        const tbody =
-            document.getElementById(
-                "statementTableBody"
-            );
-
-        if (!tbody)
-            return;
-
-        if (
-            transactions.length === 0
-        ) {
-
-            tbody.innerHTML = `
-
-                <tr>
-
-                    <td
-                        colspan="5"
-                        class="text-center">
-
-                        No transactions found
-
-                    </td>
-
-                </tr>
-
-            `;
-
-            return;
-        }
-
-        tbody.innerHTML = "";
-		tbody.innerHTML += `
-
-		<tr>
-
-			<td>
-				-
-			</td>
-
-			<td>
-
-				<strong>
-					Opening Balance
-				</strong>
-
-			</td>
-
-			<td>
-				-
-			</td>
-
-			<td>
-				-
-			</td>
-
-			<td>
-
-				<strong>
-
-					${App.formatCurrency(
-						openingBalance
-					)}
-
-				</strong>
-
-			</td>
-
-		</tr>
-
-	`;
-
-        let runningBalance =
-		openingBalance;
-
-			transactions.forEach(item => {
-
-            let debit = 0;
-			let credit = 0;
-
-			let description = "";
-
-			if (
-				item.entryType ===
-				"transaction"
-			) {
-
-				description =
-					item.category || "-";
-
-				if (
-					item.type === "income"
-				) {
-
-					credit =
-						item.amount;
-
-					runningBalance +=
-						item.amount;
-
-				} else {
-
-					debit =
-						item.amount;
-
-					runningBalance -=
-						item.amount;
-
-				}
-
-			}
-			else if (
-				item.entryType ===
-				"transfer-out"
-			) {
-
-				description =
-					item.note;
-
-				debit =
-					item.amount;
-
-				runningBalance -=
-					item.amount;
-
-			}
-			else if (
-				item.entryType ===
-				"transfer-in"
-			) {
-
-				description =
-					item.note;
-
-				credit =
-					item.amount;
-
-				runningBalance +=
-					item.amount;
-
-			}else if (
-    item.entryType ===
-    "transfer"
+function renderStatement(
+    transactions,
+    openingBalance
 ) {
 
-    description =
-        item.note;
+    const tbody =
+        document.getElementById(
+            "statementTableBody"
+        );
 
-    // All Accounts mode
-    // Transfer will be shown
-    // But balance will not change
+    if (!tbody) return;
 
-			}
+    if (
+        transactions.length === 0
+    ) {
 
-            tbody.innerHTML += `
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center">
+                    No transactions found
+                </td>
+            </tr>
+        `;
 
-                <tr>
-
-                    <td>
-                        ${App.formatDate(
-                            item.date
-                        )}
-                    </td>
-
-                    <td>
-
-                       ${description}
-
-                        <br>
-
-                        <small>
-
-                            ${item.note || ""}
-
-                        </small>
-
-                    </td>
-
-                    <td>
-
-                        ${
-                            debit > 0
-                            ? App.formatCurrency(
-                                debit
-                              )
-                            : "-"
-                        }
-
-                    </td>
-
-                    <td>
-
-                        ${
-                            credit > 0
-                            ? App.formatCurrency(
-                                credit
-                              )
-                            : "-"
-                        }
-
-                    </td>
-
-                    <td>
-
-                        ${App.formatCurrency(
-                            runningBalance
-                        )}
-
-                    </td>
-
-                </tr>
-
-            `;
-        }
-		);
-		document.getElementById(
-			"statementBalance"
-		).textContent =
-			App.formatCurrency(
-				runningBalance
-			);
+        return;
     }
 
+    tbody.innerHTML = "";
+
+    tbody.innerHTML += `
+        <tr>
+            <td>-</td>
+            <td>
+                <strong>
+                    Opening Balance
+                </strong>
+            </td>
+            <td>-</td>
+            <td>-</td>
+            <td>
+                <strong>
+                    ${App.formatCurrency(
+                        openingBalance
+                    )}
+                </strong>
+            </td>
+        </tr>
+    `;
+
+    let runningBalance =
+        openingBalance;
+
+    transactions.forEach(item => {
+
+        let debit = 0;
+        let credit = 0;
+
+        let description = "";
+
+        // Transaction
+        if (
+            item.entryType ===
+            "transaction"
+        ) {
+
+            description =
+                item.category || "-";
+
+            if (
+                item.type === "income"
+            ) {
+
+                credit =
+                    Number(item.amount);
+
+                runningBalance +=
+                    Number(item.amount);
+
+            } else {
+
+                debit =
+                    Number(item.amount);
+
+                runningBalance -=
+                    Number(item.amount);
+            }
+        }
+
+        // Transfer Out
+        else if (
+            item.entryType ===
+            "transfer-out"
+        ) {
+
+            description =
+                item.note;
+
+            debit =
+                Number(item.amount);
+
+            runningBalance -=
+                Number(item.amount);
+        }
+
+        // Transfer In
+        else if (
+            item.entryType ===
+            "transfer-in"
+        ) {
+
+            description =
+                item.note;
+
+            credit =
+                Number(item.amount);
+
+            runningBalance +=
+                Number(item.amount);
+        }
+
+        // ALL Accounts Transfer
+        else if (
+            item.entryType ===
+            "transfer"
+        ) {
+
+            description =
+                item.note;
+
+            debit =
+                Number(item.amount);
+
+            credit =
+                Number(item.amount);
+
+            // runningBalance change হবে না
+        }
+
+        tbody.innerHTML += `
+            <tr>
+
+                <td>
+                    ${App.formatDate(
+                        item.date
+                    )}
+                </td>
+
+                <td>
+                    ${description}
+                    <br>
+                    <small>
+                        ${item.note || ""}
+                    </small>
+                </td>
+
+                <td>
+                    ${
+                        debit > 0
+                        ? App.formatCurrency(
+                            debit
+                          )
+                        : "-"
+                    }
+                </td>
+
+                <td>
+                    ${
+                        credit > 0
+                        ? App.formatCurrency(
+                            credit
+                          )
+                        : "-"
+                    }
+                </td>
+
+                <td>
+                    ${App.formatCurrency(
+                        runningBalance
+                    )}
+                </td>
+
+            </tr>
+        `;
+
+    });
+
+    document.getElementById(
+        "statementBalance"
+    ).textContent =
+        App.formatCurrency(
+            runningBalance
+        );
+}
+					
+					
+		
     // =========================
     // SUMMARY
     // =========================

@@ -76,6 +76,11 @@ const Backup = (() => {
 
             budgets:
                 Storage.getBudgets(),
+           
+           transfers:
+                Storage.getTransfers
+              ? Storage.getTransfers()
+              : [],
 
             goals:
                 Storage.getGoals
@@ -224,6 +229,18 @@ const Backup = (() => {
                     )
                 );
 
+               localStorage.setItem(
+
+               "em_transfers",
+
+               JSON.stringify(
+
+               data.transfers || []
+
+              )
+
+             );
+
                 localStorage.setItem(
                     "em_goals",
                     JSON.stringify(
@@ -294,6 +311,10 @@ const Backup = (() => {
         localStorage.removeItem(
             "em_budgets"
         );
+
+       localStorage.removeItem(
+    "em_transfers"
+);
 
         localStorage.removeItem(
             "em_goals"

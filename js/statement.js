@@ -229,7 +229,7 @@ transactions.forEach(t => {
 });
 
 
-	transfers.forEach(t => {
+transfers.forEach(t => {
 
     if (account === "ALL") {
 
@@ -281,12 +281,15 @@ transactions.forEach(t => {
 
     }
 
-}
-		
-		
-		);
+});
 
 
+
+
+
+
+
+				
 
 			ledgerEntries.sort(
 

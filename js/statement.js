@@ -230,36 +230,14 @@ transactions.forEach(t => {
 
 transfers.forEach(t => {
 
- if (
-    account === "ALL"
-) {
-
-    ledgerEntries.push({
-
-        entryType:
-                "transfer",
-
-        date:
-            t.date,
-
-        amount:
-            t.amount,
-
-        note:
-            `Transfer ${t.fromAccount} → ${t.toAccount}`
-
-    });
-
-}   
-	
-	
-	
-	{
+    if (
+        account === "ALL"
+    ) {
 
         ledgerEntries.push({
 
             entryType:
-                "transfer-out",
+                "transfer",
 
             date:
                 t.date,
@@ -273,6 +251,58 @@ transfers.forEach(t => {
         });
 
     }
+    else {
+
+        if (
+            t.fromAccount === account
+        ) {
+
+            ledgerEntries.push({
+
+                entryType:
+                    "transfer-out",
+
+                date:
+                    t.date,
+
+                amount:
+                    t.amount,
+
+                note:
+                    `Transfer To ${t.toAccount}`
+
+            });
+
+        }
+
+        if (
+            t.toAccount === account
+        ) {
+
+            ledgerEntries.push({
+
+                entryType:
+                    "transfer-in",
+
+                date:
+                    t.date,
+
+                amount:
+                    t.amount,
+
+                note:
+                    `Transfer From ${t.fromAccount}`
+
+            });
+
+        }
+
+    }
+
+});
+
+
+
     else {
 
         if (

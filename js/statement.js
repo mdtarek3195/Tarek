@@ -230,9 +230,31 @@ transactions.forEach(t => {
 
 transfers.forEach(t => {
 
-    if (
-        account === "ALL"
-    ) {
+ if (
+    account === "ALL"
+) {
+
+    ledgerEntries.push({
+
+        entryType:
+                "transfer",
+
+        date:
+            t.date,
+
+        amount:
+            t.amount,
+
+        note:
+            `Transfer ${t.fromAccount} → ${t.toAccount}`
+
+    });
+
+}   
+	
+	
+	
+	{
 
         ledgerEntries.push({
 
@@ -402,7 +424,7 @@ function calculateOpeningBalance(
 
 	
 
-		function renderStatement(
+	function renderStatement(
 			transactions,
 			openingBalance
 		) {
@@ -546,6 +568,18 @@ function calculateOpeningBalance(
 
 				runningBalance +=
 					item.amount;
+
+			}else if (
+    item.entryType ===
+    "transfer"
+) {
+
+    description =
+        item.note;
+
+    // All Accounts mode
+    // Transfer will be shown
+    // But balance will not change
 
 			}
 

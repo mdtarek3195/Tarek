@@ -102,6 +102,9 @@ const Statement = (() => {
 
     function generateStatement() {
 
+		let transactions =
+    Storage.getTransactions();
+
         const account =
             document.getElementById(
                 "statementAccount"
@@ -128,9 +131,8 @@ const Statement = (() => {
 
 		if (
 
-    selectedAccount !==
-    "ALL"
-
+if (
+    account !== "ALL"
 ) {
 
     transactions =
@@ -139,33 +141,65 @@ const Statement = (() => {
 
             t =>
 
-            t.account ===
-
-            selectedAccount
+                t.account === account
 
         );
 
-		}
+}
 
-		const transfers =
-			Storage.getTransfers()
-			.filter(t =>
+		transactions =
 
-				(
-					t.fromAccount === account ||
+    transactions.filter(
 
-					t.toAccount === account
-				)
+        t =>
 
-				&&
+            (!fromDate ||
 
-				t.date >= fromDate
+                t.date >= fromDate)
 
-				&&
+            &&
 
-				t.date <= toDate
+            (!toDate ||
 
-			);
+                t.date <= toDate)
+
+    );
+
+const transfers =
+    Storage.getTransfers()
+    .filter(t =>
+
+        (
+
+            account === "ALL"
+
+            ||
+
+            t.fromAccount === account
+
+            ||
+
+            t.toAccount === account
+
+        )
+
+        &&
+
+        (!fromDate ||
+
+            t.date >= fromDate)
+
+        &&
+
+        (!toDate ||
+
+            t.date <= toDate)
+
+    );
+
+		
+		
+				
 			const ledgerEntries = [];
 			
 			transactions.forEach(t => {
@@ -276,6 +310,68 @@ const Statement = (() => {
     // =========================
     // RENDER TABLE
     // =========================
+
+function calculateOpeningBalance(
+
+    account,
+
+    fromDate
+
+) {
+
+    const transactions =
+
+        Storage.getTransactions();
+
+    let balance = 0;
+
+    transactions.forEach(t => {
+
+        const accountMatch =
+
+            account === "ALL"
+
+            ||
+
+            t.account === account;
+
+        if (
+
+            accountMatch
+
+            &&
+
+            t.date < fromDate
+
+        ) {
+
+            if (
+
+                t.type === "income"
+
+            ) {
+
+                balance +=
+
+                    t.amount;
+
+            } else {
+
+                balance -=
+
+                    t.amount;
+
+            }
+
+        }
+
+    });
+
+    return balance;
+
+}
+
+	
 
 		function renderStatement(
 			transactions,
@@ -497,42 +593,7 @@ const Statement = (() => {
     // SUMMARY
     // =========================
 
-	function calculateOpeningBalance(
-		account,
-		fromDate
-	) {
-
-		const transactions =
-			Storage.getTransactions();
-
-		let balance = 0;
-
-		transactions.forEach(t => {
-
-			if (
-				t.account === account &&
-				t.date < fromDate
-			) {
-
-				if (
-					t.type === "income"
-				) {
-
-					balance +=
-						t.amount;
-
-				} else {
-
-					balance -=
-						t.amount;
-				}
-			}
-
-		});
-
-		return balance;
-	}
-
+	
 
     function updateSummary(
         transactions,

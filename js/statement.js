@@ -129,7 +129,7 @@ const Statement = (() => {
             return;
         }
 
-		if (
+		
 
 if (
     account !== "ALL"
@@ -228,55 +228,101 @@ const transfers =
 
 				});
 				
-				transfers.forEach(t => {
+		
+                    t.date,
 
-				if (
-					t.fromAccount === account
-				) {
+                amount:
+                    t.amount,
 
-					ledgerEntries.push({
+                note:
+                    `Transfer From ${t.fromAccount}`
 
-						entryType:
-							"transfer-out",
+            });
 
-						date:
-							t.date,
+        }
 
-						amount:
-							t.amount,
+    }
 
-						note:
+});
 
-							`Transfer To ${t.toAccount}`
+		transfers.forEach(t => {
 
-					});
+    if (
+        account === "ALL"
+    ) {
 
-				}
+        ledgerEntries.push({
 
-				if (
-					t.toAccount === account
-				) {
+            entryType:
+                "transfer-out",
 
-					ledgerEntries.push({
+            date:
+                t.date,
 
-						entryType:
-							"transfer-in",
+            amount:
+                t.amount,
 
-						date:
-							t.date,
+            note:
+                `Transfer ${t.fromAccount} → ${t.toAccount}`
 
-						amount:
-							t.amount,
+        });
 
-						note:
+    }
+    else {
 
-							`Transfer From ${t.fromAccount}`
+        if (
+            t.fromAccount === account
+        ) {
 
-					});
+            ledgerEntries.push({
 
-				}
+                entryType:
+                    "transfer-out",
 
-			});
+                date:
+                    t.date,
+
+                amount:
+                    t.amount,
+
+                note:
+                    `Transfer To ${t.toAccount}`
+
+            });
+
+        }
+
+        if (
+            t.toAccount === account
+        ) {
+
+            ledgerEntries.push({
+
+                entryType:
+                    "transfer-in",
+
+                date:
+                    t.date,
+
+                amount:
+                    t.amount,
+
+                note:
+                    `Transfer From ${t.fromAccount}`
+
+            });
+
+        }
+
+    }
+
+});		
+
+
+
+
+
+							
 			
 			ledgerEntries.sort(
 
@@ -639,11 +685,13 @@ function calculateOpeningBalance(
             );
 
         document.getElementById(
-            "statementBalance"
-        ).textContent =
-            App.formatCurrency(
-                runningBalance
-            );
+    "statementBalance"
+).textContent =
+    App.formatCurrency(
+        openingBalance +
+        totalCredit -
+        totalDebit
+    );
     }
 
     // =========================

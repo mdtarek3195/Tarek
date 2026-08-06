@@ -15,44 +15,69 @@
 		let expenseCustomTo = null;
 		let topExpenseCustomFrom = null;
 		let topExpenseCustomTo = null;
+		let dailyTrendChart = null;
+		let dailyTrendType = "expense";
+		let dailyTrendSelected = "7days";
+		let dailyTrendCustomFrom = null;
+		let dailyTrendCustomTo = null;
 
 		// =========================
 		// INIT
 		// =========================
 
-	function init() {
+function init() {
 
-		loadKPIs();
-		
-		loadOutstandingLoan();
+    loadKPIs();
 
-		loadRecentTransactions();
+    loadOutstandingLoan();
 
-		renderIncomeExpenseChart();
+    loadRecentTransactions();
 
-		renderGoalWidget();
-		
-		loadFinancialHealth();
+    renderIncomeExpenseChart();
 
-		renderExpenseCategoryChart();
-		
-		initializeExpenseFilter();
-		
-		initializeTopExpenseFilter();
-		
-		loadTopExpenses();
-		
-		initializeExpenseCustomRange();
-		
-		initializeTopExpenseCustomRange();
-		
-		loadSpendingInsights();
+    renderGoalWidget();
 
-		loadSmartInsights();
-		
+    loadFinancialHealth();
 
+    renderExpenseCategoryChart();
 
-	}
+    initializeExpenseFilter();
+
+    initializeTopExpenseFilter();
+
+    loadTopExpenses();
+
+    initializeExpenseCustomRange();
+
+    initializeTopExpenseCustomRange();
+
+    loadSpendingInsights();
+
+    loadSmartInsights();
+
+    initializeDailyTrendFilter();
+	
+	initializeDailyTrendTypeFilter();
+
+    renderDailyTrendChart();
+
+    document
+    .getElementById(
+        "dailyTrendType"
+    )
+    ?.addEventListener(
+        "change",
+        function(){
+
+            dailyTrendType =
+                this.value;
+
+            renderDailyTrendChart();
+
+        }
+    );
+
+}
 
     // =========================
     // KPI CARDS
@@ -2040,6 +2065,654 @@ const displayLabels =
 
 }
 
+
+function renderDailyTrendChart() {
+
+    const transactions =
+        Storage.getTransactions();
+
+    const today =
+        new Date();
+
+    const dailyTotals = {};
+
+    let startDate =
+        new Date();
+
+    switch(dailyTrendSelected){
+
+        case "7days":
+
+            startDate.setDate(
+                today.getDate() - 6
+            );
+
+            break;
+
+        case "15days":
+
+            startDate.setDate(
+                today.getDate() - 14
+            );
+
+            break;
+
+        case "30days":
+
+            startDate.setDate(
+                today.getDate() - 29
+            );
+
+            break;
+
+    }
+
+    transactions.forEach(item => {
+
+        if(
+            item.type !==
+            dailyTrendType
+        ){
+            return;
+        }
+
+        const d =
+            new Date(item.date);
+
+        let include = false;
+
+        if(
+            dailyTrendSelected ===
+            "custom"
+        ){
+
+            include =
+
+                item.date >=
+                dailyTrendCustomFrom
+
+                &&
+
+                item.date <=
+                dailyTrendCustomTo;
+
+        }
+
+        else{
+
+            include =
+                d >= startDate;
+        }
+
+        if(!include)
+            return;
+
+        const dateKey =
+            item.date;
+
+        dailyTotals[dateKey] =
+
+            (dailyTotals[dateKey] || 0)
+
+            + Number(item.amount);
+
+    });
+
+    const labels =
+        Object.keys(dailyTotals)
+        .sort();
+
+    const values =
+        labels.map(
+            d => dailyTotals[d]
+        );
+
+    const displayLabels =
+        labels.map(d => {
+
+            const date =
+                new Date(d);
+
+            return date.toLocaleDateString(
+                "en-US",
+                {
+                    day:"2-digit",
+                    month:"short"
+                }
+            );
+
+        });
+
+    const ctx =
+        document.getElementById(
+            "dailyTrendChart"
+        );
+
+    if(!ctx)
+        return;
+
+    if(dailyTrendChart){
+
+        dailyTrendChart.destroy();
+
+    }
+
+    dailyTrendChart =
+        new Chart(ctx, {
+
+            type: "bar",
+
+            data: {
+
+                labels:
+                    displayLabels,
+
+                fullDates:
+                    labels,
+
+                datasets: [{
+
+                    label:
+                        dailyTrendType
+                        === "income"
+
+                        ?
+
+                        "Income"
+
+                        :
+
+                        "Expense",
+
+                    data:
+                        values,
+
+                    backgroundColor:
+
+                        dailyTrendType
+                        === "income"
+
+                        ?
+
+                        "#10B981"
+
+                        :
+
+                        "#EF4444",
+
+                    borderRadius: 6,
+
+                    borderSkipped: false,
+
+                    maxBarThickness: 45
+
+                }]
+
+            },
+
+            plugins: [
+
+                ChartDataLabels
+
+            ],
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                onClick:
+                    function(
+                        event,
+                        elements
+                    ){
+
+                    if(
+                        !elements.length
+                    )
+                        return;
+
+                    const index =
+                        elements[0].index;
+
+                    const date =
+                        this.data.fullDates[index];
+
+                    showDailyTransactions(
+                        date
+                    );
+
+                },
+
+                plugins: {
+
+                    datalabels: {
+
+                        anchor: "end",
+
+                        align: "top",
+
+                        color: "#111827",
+
+                        font: {
+
+                            size: 10,
+
+                            weight: "bold"
+
+                        },
+
+                        formatter:
+                            value =>
+
+                            value > 0
+
+                            ?
+
+                            value.toLocaleString()
+
+                            :
+
+                            ""
+
+                    },
+
+                    tooltip: {
+
+                        backgroundColor:
+                            "#111827",
+
+                        titleColor:
+                            "#fff",
+
+                        bodyColor:
+                            "#fff",
+
+                        displayColors:
+                            false,
+
+                        callbacks: {
+
+                            label:
+                                function(
+                                    context
+                                ){
+
+                                return App.formatCurrency(
+                                    context.raw
+                                );
+
+                            }
+
+                        }
+
+                    },
+
+                    legend: {
+
+                        display: false
+
+                    }
+
+                },
+
+                scales: {
+
+                    x: {
+
+                        grid: {
+
+                            display:false
+
+                        }
+
+                    },
+
+                    y: {
+
+                        beginAtZero:true,
+
+                        grid: {
+
+                            color:"#E5E7EB"
+
+                        },
+
+                        ticks: {
+
+                            callback:
+                                value =>
+
+                                "৳" +
+                                value.toLocaleString()
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+}
+
+function showDailyTransactions(date){
+
+    const modal =
+        document.getElementById(
+            "dailyTrenddetails"
+        );
+
+    const body =
+        document.getElementById(
+            "trendModalBody"
+        );
+
+    const title =
+        document.getElementById(
+            "trendModalTitle"
+        );
+
+    const transactions =
+
+        Storage.getTransactions()
+
+        .filter(t =>
+
+            t.type ===
+            dailyTrendType
+
+            &&
+
+            t.date === date
+
+        );
+
+    title.textContent =
+
+        `${dailyTrendType
+            .charAt(0)
+            .toUpperCase()
+         }${dailyTrendType
+            .slice(1)
+         } Transactions - ${App.formatDate(date)}`;
+
+    const totalAmount =
+
+        transactions.reduce(
+
+            (sum,t)=>
+
+                sum +
+                Number(t.amount),
+
+            0
+
+        );
+
+    body.innerHTML = "";
+
+    if(transactions.length === 0){
+
+        body.innerHTML = `
+
+        <tr>
+
+            <td
+                colspan="4"
+                style="
+                    text-align:center;
+                    padding:20px;
+                ">
+
+                No Transactions Found
+
+            </td>
+
+        </tr>
+
+        `;
+
+    }
+
+    else{
+
+        transactions.forEach(t => {
+
+			body.innerHTML += `
+
+			<tr>
+
+				<td>
+					${App.formatDate(t.date)}
+				</td>
+
+				<td>
+					${t.category || "-"}
+				</td>
+
+				<td>
+					${t.note || "-"}
+				</td>
+
+				<td>
+					${t.account || "-"}
+				</td>
+
+				<td>
+					${App.formatCurrency(t.amount)}
+				</td>
+
+			</tr>
+
+			`;
+
+        });
+
+		body.innerHTML += `
+
+		<tr>
+
+			<td colspan="4"
+				style="
+					font-weight:bold;
+					text-align:right;
+					background:#f3f4f6;
+					padding:12px;
+				">
+
+				Total
+
+			</td>
+
+			<td
+				style="
+					font-weight:bold;
+					background:#f3f4f6;
+					padding:12px;
+				">
+
+				${App.formatCurrency(totalAmount)}
+
+			</td>
+
+		</tr>
+
+		`;
+
+    }
+
+    modal.style.display =
+        "flex";
+
+}
+
+function initializeDailyTrendFilter(){
+
+    const menu =
+        document.getElementById(
+            "dailyTrendFilterMenu"
+        );
+
+    const btn =
+        document.getElementById(
+            "dailyTrendFilterBtn"
+        );
+
+    const label =
+        document.getElementById(
+            "dailyTrendFilterLabel"
+        );
+
+    const arrow =
+        document.getElementById(
+            "dailyTrendFilterArrow"
+        );
+
+    if(
+        !menu ||
+        !btn
+    ){
+        return;
+    }
+
+    const filters = [
+
+        {
+            value:"7days",
+            label:"Last 7 Days"
+        },
+
+        {
+            value:"15days",
+            label:"Last 15 Days"
+        },
+
+        {
+            value:"30days",
+            label:"Last 30 Days"
+        },
+
+    ];
+
+    menu.innerHTML =
+
+        filters.map(item => `
+
+            <div
+                class="expense-filter-item"
+                data-value="${item.value}">
+
+                ${item.label}
+
+            </div>
+
+        `).join("");
+
+    btn.addEventListener(
+        "click",
+        function(){
+
+            menu.classList.toggle(
+                "show"
+            );
+
+            arrow.textContent =
+
+                menu.classList.contains(
+                    "show"
+                )
+
+                ?
+
+                "▲"
+
+                :
+
+                "▼";
+
+        }
+    );
+
+    menu.addEventListener(
+        "click",
+        function(e){
+
+            const item =
+                e.target.closest(
+                    ".expense-filter-item"
+                );
+
+            if(!item)
+                return;
+
+            dailyTrendSelected =
+                item.dataset.value;
+
+            label.textContent =
+                item.textContent.trim();
+
+            menu.classList.remove(
+                "show"
+            );
+
+            arrow.textContent =
+                "▼";
+
+            if(
+                dailyTrendSelected ===
+                "custom"
+            ){
+
+                document
+                .getElementById(
+                    "dailyTrendDateModal"
+                )
+                .style.display =
+                "flex";
+
+            }
+
+            else{
+
+                renderDailyTrendChart();
+
+            }
+
+        }
+    );
+
+    document.addEventListener(
+        "click",
+        function(e){
+
+            if(
+                !btn.contains(e.target)
+
+                &&
+
+                !menu.contains(e.target)
+            ){
+
+                menu.classList.remove(
+                    "show"
+                );
+
+                arrow.textContent =
+                    "▼";
+
+            }
+
+        }
+    );
+	
+
+}
+
+
 	
 	
 function initializeExpenseFilter(){
@@ -2161,6 +2834,110 @@ function initializeExpenseFilter(){
     });
 
 }
+
+
+
+function initializeDailyTrendTypeFilter(){
+
+    const btn =
+        document.getElementById(
+            "dailyTrendTypeBtn"
+        );
+
+    const menu =
+        document.getElementById(
+            "dailyTrendTypeMenu"
+        );
+
+    const label =
+        document.getElementById(
+            "dailyTrendTypeLabel"
+        );
+
+    const arrow =
+        document.getElementById(
+            "dailyTrendTypeArrow"
+        );
+
+    btn.addEventListener(
+        "click",
+        function(){
+
+            menu.classList.toggle(
+                "show"
+            );
+
+            arrow.textContent =
+
+                menu.classList.contains(
+                    "show"
+                )
+
+                ? "▲"
+
+                : "▼";
+
+        }
+    );
+
+    menu.addEventListener(
+        "click",
+        function(e){
+
+            const item =
+                e.target.closest(
+                    ".expense-filter-item"
+                );
+
+            if(!item)
+                return;
+
+            dailyTrendType =
+                item.dataset.type;
+
+            label.textContent =
+                item.textContent.trim();
+
+            menu.classList.remove(
+                "show"
+            );
+
+            arrow.textContent =
+                "▼";
+
+            renderDailyTrendChart();
+
+        }
+    );
+	
+	document.addEventListener(
+    "click",
+    function(e){
+
+        if(
+
+            !btn.contains(e.target)
+
+            &&
+
+            !menu.contains(e.target)
+
+        ){
+
+            menu.classList.remove(
+                "show"
+            );
+
+            arrow.textContent =
+                "▼";
+
+        }
+
+    }
+);
+
+}
+
 
 function initializeExpenseCustomRange(){
 
@@ -2304,6 +3081,28 @@ function initializeTopExpenseCustomRange(){
 
         }
     );
+	
+	   document
+    .getElementById(
+        "topExpenseCancelBtn"
+    )
+    ?.addEventListener(
+        "click",
+        function(){
+
+            document
+            .getElementById(
+                "topExpenseDateModal"
+            )
+            .style.display =
+                "none";
+
+        }
+    );
+	
+	
+	
+	
 
 }
 
@@ -3293,6 +4092,27 @@ document.addEventListener(
             document
             .getElementById(
                 "expenseDetailsModal"
+            )
+            .style.display =
+                "none";
+
+        }
+
+    }
+);
+
+document.addEventListener(
+    "click",
+    function(e){
+
+        if(
+            e.target.id ===
+            "trendModalClose"
+        ){
+
+            document
+            .getElementById(
+                "dailyTrenddetails"
             )
             .style.display =
                 "none";

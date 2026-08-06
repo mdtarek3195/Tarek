@@ -372,9 +372,10 @@ Expense Filter
 ==================================*/
 
 .expense-filter{
-
     position:relative;
-
+    display:inline-flex;
+    width:auto;
+    flex:0 0 auto;
 }
 
 .expense-filter-btn{
@@ -465,6 +466,8 @@ Expense Filter
 
     z-index:9999;
 }
+
+
 
 .expense-filter-menu.show{
 
@@ -614,6 +617,17 @@ Expense Filter
     cursor:pointer;
 
 }
+#trendModalClose{
+
+    border:none;
+
+    background:none;
+
+    font-size:20px;
+
+    cursor:pointer;
+
+}
 
 /* ==========================
   CHART Modal
@@ -741,7 +755,7 @@ Expense Filter
 
 }
 .table-container{
-    max-height: 380px;      /* প্রায় 10 row */
+    max-height: 500px;      /* প্রায় 10 row */
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -758,6 +772,21 @@ Expense Filter
     z-index: 2;
 }
 
+.btn-secondary{
+
+    background:#ef4444;
+
+    color:#fff;
+
+    border:none;
+
+}
+
+.btn-secondary:hover{
+
+    background:#dc2626;
+
+}
 /*==================================
 Transaction Header
 ==================================*/

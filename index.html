@@ -351,17 +351,118 @@
             <!-- Charts Row -->
             <div class="dashboard-row section">
 
-                <div class="chart-box">
+				<div class="chart-box">
 
-                    <h3 class="mb-10">
-                        Income vs Expense Trend
-                    </h3>
+					<div class="chart-header">
 
-                    <canvas id="incomeExpenseChart"></canvas>
+						<h3>
+							Daily Trend
+						</h3>
+<div
+    style="
+        display:flex;
+        flex-direction:row;
+        gap:10px;
+        align-items:center;
+        justify-content:flex-end;
+        flex-wrap:nowrap;
+    ">
+							<div class="expense-filter">
+							   <button
+									type="button"
+									id="dailyTrendTypeBtn"
+									class="expense-filter-btn">
 
-                </div>
-				
-				
+									<span>
+										💳
+									</span>
+
+									<span id="dailyTrendTypeLabel">
+
+										Expense
+
+									</span>
+
+									<span
+										id="dailyTrendTypeArrow"
+										class="filter-arrow">
+
+										▼
+
+									</span>
+
+								</button>
+
+								<div
+									id="dailyTrendTypeMenu"
+									class="expense-filter-menu">
+
+									<div
+										class="expense-filter-item"
+										data-type="expense">
+
+										Expense
+
+									</div>
+
+									<div
+										class="expense-filter-item"
+										data-type="income">
+
+										Income
+
+									</div>
+
+								</div>
+								<button
+									type="button"
+									id="dailyTrendFilterBtn"
+									class="expense-filter-btn">
+
+									<span class="filter-icon">
+
+										📅
+
+									</span>
+
+									<span id="dailyTrendFilterLabel">
+
+										Last 7 Days
+
+									</span>
+
+									<span
+										id="dailyTrendFilterArrow"
+										class="filter-arrow">
+
+										▼
+
+									</span>
+
+								</button>
+
+								<div
+									id="dailyTrendFilterMenu"
+									class="expense-filter-menu">
+
+								</div>
+
+							</div>
+						</div>
+
+					</div>
+
+					<div class="chart-wrapper">
+
+						<canvas
+							id="dailyTrendChart">
+
+						</canvas>
+
+					</div>
+
+				</div>
+							
 				<div class="chart-box">
 				<div class="chart-header">
 
@@ -408,6 +509,64 @@
 
 					</div>
 				</div>
+				
+                <div class="chart-box">
+				
+                    <h3 class="mb-10">
+                        Income vs Expense Trend
+                    </h3>
+
+                    <canvas id="incomeExpenseChart"></canvas>
+
+                </div>	
+
+				<div id="dailyTrenddetails" class="cmodal">
+
+					<div class="cmodal-content">
+
+						<div class="cmodal-header">
+
+							<h3 id="trendModalTitle">
+
+								Daily Trend Details
+
+							</h3>
+
+							<button
+								id="trendModalClose">
+
+								✕
+
+							</button>
+
+						</div>
+
+						<table class="table">
+
+							<thead>
+
+								<tr>
+
+									<th>Date</th>
+									<th>Category</th>
+									<th>Note</th>
+									<th>Account</th>
+									<th>Amount</th>
+
+								</tr>
+
+							</thead>
+
+							<tbody
+								id="trendModalBody">
+
+							</tbody>
+
+						</table>
+
+					</div>
+
+				</div>				
 				
 				<div id="expenseDetailsModal" class="cmodal">
 
@@ -742,7 +901,6 @@
     </div>
 
 </div>
-
 
 
 
